@@ -1,5 +1,4 @@
-# Copyright 2012 OpenStack LLC.
-# All Rights Reserved.
+#    Copyright (c) 2013 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 
 from metadataclient.common import http
 from metadataclient.v1 import metadata_client
@@ -31,5 +31,6 @@ class Client(http.HTTPClient):
     def __init__(self, *args, **kwargs):
         """Initialize a new client for the Murano Metadata Client v1 API."""
         super(Client, self).__init__(*args, **kwargs)
-        self.metadata_client = metadata_client.MetadataClientManager(self)
-        # self.metadata_admin = metadata_admin.MetadataAdminManager(self)
+        self.http_client = http.HTTPClient(*args, **kwargs)
+        self.metadata_client = metadata_client.Controller(self)
+        self.metadata_admin = metadata_admin.Controller(self)
