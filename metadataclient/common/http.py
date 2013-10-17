@@ -235,7 +235,7 @@ class HTTPClient(object):
         elif resp.status in (301, 302, 305):
             # Redirected. Reissue the request to the new location.
             return self._http_request(resp['location'], method, **kwargs)
-        elif resp.status == 300:
+        elif resp.status in (300, 304):
             raise exc.from_response(resp)
 
         return resp, body_iter
@@ -270,12 +270,6 @@ class HTTPClient(object):
                 # We use 'Transfer-Encoding: chunked' because
                 # body size may not always be known in advance.
                 kwargs['headers']['Transfer-Encoding'] = 'chunked'
-        return self._http_request(url, method, **kwargs)
-
-    def archive_request(self, method, url, **kwargs):
-        kwargs.setdefault('headers', {})
-        kwargs['headers'].setdefault('Content-Type',
-                                     'application/x-tar')
         return self._http_request(url, method, **kwargs)
 
 

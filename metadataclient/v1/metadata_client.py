@@ -39,7 +39,7 @@ class Controller(object):
 
         """
         url = '/v1/client/ui'
-        resp, body = self.http_client.archive_request('GET', url)
+        resp, body = self.http_client.raw_request('GET', url)
         return body
 
     def get_conductor_data(self):
@@ -48,5 +48,5 @@ class Controller(object):
 
         """
         url = '/v1/client/conductor'
-        resp, body = self.http_client.archive_request('GET', url)
+        resp, body = self.http_client.raw_request('GET', url)
         return body
