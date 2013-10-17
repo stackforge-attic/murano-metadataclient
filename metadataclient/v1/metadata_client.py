@@ -33,20 +33,27 @@ class Controller(object):
     def __init__(self, http_client):
         self.http_client = http_client
 
-    def get_ui_data(self):
+    def _get_data(self, endpoint_type, hash_sum=None):
+        if hash_sum:
+            url = '/v1/client/{0}?hash={1}'.format(endpoint_type, hash_sum)
+        else:
+            url = '/v1/client/{0}'.format(endpoint_type)
+        return self.http_client.raw_request('GET', url)
+
+    def get_ui_data(self, hash_sum=None):
         """
-        Download tar.gz with
+        Download tar.gz with ui metadata. Returns a tuple
+        (status, body_iterator) where status can be either 200 or 304. In the
+        304 case there is no sense in iterating with body_iterator.
 
         """
-        url = '/v1/client/ui'
-        resp, body = self.http_client.raw_request('GET', url)
-        return body
+        return self._get_data('ui', hash_sum=hash_sum)
 
-    def get_conductor_data(self):
+    def get_conductor_data(self, hash_sum=None):
         """
-        Download tar.gz with
+        Download tar.gz with conductor metadata. Returns a tuple
+        (status, body_iterator) where status can be either 200 or 304. In the
+        304 case there is no sense in iterating with body_iterator.
 
         """
-        url = '/v1/client/conductor'
-        resp, body = self.http_client.raw_request('GET', url)
-        return body
+        return self._get_data('conductor', hash_sum=hash_sum)

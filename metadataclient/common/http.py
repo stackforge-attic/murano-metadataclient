@@ -235,7 +235,7 @@ class HTTPClient(object):
         elif resp.status in (301, 302, 305):
             # Redirected. Reissue the request to the new location.
             return self._http_request(resp['location'], method, **kwargs)
-        elif resp.status in (300, 304):
+        elif resp.status == 300:
             raise exc.from_response(resp)
 
         return resp, body_iter

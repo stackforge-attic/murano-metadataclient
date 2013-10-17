@@ -62,10 +62,6 @@ class HTTPMultipleChoices(HTTPException):
                                     self.details)
 
 
-class HTTPNotModified(HTTPException):
-    code = 304
-
-
 class BadRequest(HTTPException):
     """DEPRECATED!"""
     code = 400
