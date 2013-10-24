@@ -17,9 +17,9 @@ import sys
 import uuid
 
 import os
-from muranoclient.common import exceptions
+from metadataclient.common import exceptions
 import prettytable
-from muranoclient.openstack.common import importutils
+from metadataclient.openstack.common import importutils
 
 
 # Decorator for cli-args
