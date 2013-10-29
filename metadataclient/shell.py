@@ -132,8 +132,8 @@ class MuranoRepositoryShell(object):
         parser.add_argument('--murano_metadata-api-version',
                             default=utils.env(
                                 'MURANO_METADATA_API_VERSION', default='1'),
-                            help='Defaults to env[MURANO_METADATA_API_VERSION] '
-                                 'or 1')
+                            help='Defaults to env[MURANO_METADATA_API_VERSION]'
+                                 ' or 1')
         return parser
 
     def get_subcommand_parser(self, version):
