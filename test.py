@@ -12,7 +12,7 @@ def metadataclient():
 def main():
     # metadataclient().metadata_client.get_ui_data()
     metadataclient().metadata_client.get_conductor_data()
-    admin = metadataclient().metadata_admin
+    # admin = metadataclient().metadata_admin
     # print admin.list_ui()
     # print admin.list_ui('Murano')
     # print admin.list_agent()
