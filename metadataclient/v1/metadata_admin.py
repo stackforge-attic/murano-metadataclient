@@ -12,11 +12,62 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
+from metadataclient import exc
+
+
+class Wrapper(object):
+    def __init__(self, service_id, **kwargs):
+        self.id = service_id
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 class Controller(object):
     def __init__(self, http_client):
         self.http_client = http_client
+
+    def list_services(self):
+        resp, body = self.http_client.json_request('GET', '/v1/admin/services')
+        services = body.get('services', None)
+        if services:
+            return [Wrapper(service['full_service_name'], **service)
+                    for service in services]
+        else:
+            raise exc.CommunicationError(
+                "No 'services' field in list_services response")
+
+    def download_service(self, service):
+        resp, body = self.http_client.raw_request(
+            'GET', '/v1/client/services/{service}'.format(service=service))
+        if resp.status != 200:
+            raise exc.CommunicationError(
+                "Failed to download service '{service}".format(
+                    service=service))
+        else:
+            return body
+
+    def upload_service(self, data):
+        resp, body = self.http_client.raw_request(
+            'POST', '/v1/admin/services/', body=data)
+        if resp.status != 200:
+            raise exc.CommunicationError('Failed to upload service.')
+
+    def delete_service(self, service):
+        resp, body = self.http_client.raw_request(
+            'DELETE', '/v1/admin/services/{service}'.format(service=service))
+        if resp.status != 200:
+            raise exc.CommunicationError(
+                "Deletion of service '{service} failed".format(
+                    service=service))
+
+    def toggle_enabled(self, service):
+        resp, body = self.http_client.raw_request(
+            'POST', '/v1/admin/services/{service}/toggleEnabled'.format(
+                service=service))
+        if resp.status != 200:
+            raise exc.CommunicationError(
+                "Toggling of service '{service} failed".format(
+                    service=service))
 
     def list_ui(self, path=None):
         if path:
