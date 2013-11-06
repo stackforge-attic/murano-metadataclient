@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
+from os.path import dirname, basename
+
 from metadataclient import exc
 
 
@@ -34,6 +36,24 @@ class Controller(object):
                     for service in services]
         else:
             raise exc.HTTPInternalServerError()
+
+    def get_service_files(self, service, data_type):
+        assert data_type in ('agent', 'heat', 'scripts', 'ui', 'workflows')
+
+        included_files = {}
+        if service:
+            resp, body = self.http_client.json_request(
+                'GET', '/v1/admin/services/{service}'.format(service=service))
+            for path in body.get('service_files', {}).get(data_type, []):
+                included_files[path] = True
+
+        resp, body = self.http_client.json_request(
+            'GET', '/v1/admin/{data_type}'.format(data_type=data_type))
+        all_files = body.get(data_type, [])
+
+        return [Wrapper(path, path=dirname(path), filename=basename(path),
+                        selected=included_files.get(path, False))
+                for path in all_files]
 
     def download_service(self, service):
         resp, body = self.http_client.raw_request(
