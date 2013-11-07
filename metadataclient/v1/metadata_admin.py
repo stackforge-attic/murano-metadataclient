@@ -122,8 +122,11 @@ class Controller(object):
         resp, body = self.http_client.json_request('GET', url)
         return body
 
-    def upload_file(self, data_type, file_data):
-        url = '/v1/admin/{0}'.format(data_type)
+    def upload_file(self, data_type, file_data, file_name=None):
+        if file_name:
+            url = '/v1/admin/{0}?filename={1}'.format(data_type, file_name)
+        else:
+            url = '/v1/admin/{0}'.format(data_type)
         hdrs = {'Content-Type': 'application/octet-stream'}
         self.http_client.raw_request('POST', url,
                                      headers=hdrs,
@@ -146,6 +149,6 @@ class Controller(object):
         url = '/v1/admin/{0}/{1}'.format(data_type, dir_name)
         self.http_client.json_request('PUT', url)
 
-    def delete_dir(self, data_type, path):
+    def delete(self, data_type, path):
         url = '/v1/admin/{0}/{1}'.format(data_type, path)
         self.http_client.json_request('DELETE', url)
