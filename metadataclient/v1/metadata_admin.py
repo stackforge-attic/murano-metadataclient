@@ -15,7 +15,7 @@ import StringIO
 from os.path import dirname, basename
 
 from metadataclient import exc
-from urllib import quote_plus
+from urllib import quote, quote_plus, urlencode
 
 
 class Wrapper(object):
@@ -77,7 +77,7 @@ class Controller(object):
 
     def list_ui(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/ui/{path}'.format(path=path))
+            url = quote('/v1/admin/ui/{path}'.format(path=path))
         else:
             url = '/v1/admin/ui'
         resp, body = self.http_client.json_request('GET', url)
@@ -85,7 +85,7 @@ class Controller(object):
 
     def list_agent(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/agent/{path}'.format(path=path))
+            url = quote('/v1/admin/agent/{path}'.format(path=path))
         else:
             url = '/v1/admin/agent'
         resp, body = self.http_client.json_request('GET', url)
@@ -93,7 +93,7 @@ class Controller(object):
 
     def list_scripts(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/scripts/{path}'.format(path=path))
+            url = quote('/v1/admin/scripts/{path}'.format(path=path))
         else:
             url = '/v1/admin/scripts'
         resp, body = self.http_client.json_request('GET', url)
@@ -101,7 +101,7 @@ class Controller(object):
 
     def list_workflows(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/workflows/{path}'.format(path=path))
+            url = quote('/v1/admin/workflows/{path}'.format(path=path))
         else:
             url = '/v1/admin/workflows'
         resp, body = self.http_client.json_request('GET', url)
@@ -109,7 +109,7 @@ class Controller(object):
 
     def list_heat(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/heat/{path}'.format(path=path))
+            url = quote('/v1/admin/heat/{path}'.format(path=path))
         else:
             url = '/v1/admin/heat'
         resp, body = self.http_client.json_request('GET', url)
@@ -117,7 +117,7 @@ class Controller(object):
 
     def list_manifests(self, path=None):
         if path:
-            url = quote_plus('/v1/admin/manifests/{path}'.format(path=path))
+            url = quote('/v1/admin/manifests/{path}'.format(path=path))
         else:
             url = '/v1/admin/manifests'
         resp, body = self.http_client.json_request('GET', url)
@@ -125,8 +125,8 @@ class Controller(object):
 
     def upload_file(self, data_type, file_data, file_name=None):
         if file_name:
-            # params = urlencode({'filename': file_name})
-            url = '/v1/admin/{0}?filename={1}'.format(data_type, file_name)
+            params = urlencode({'filename': file_name})
+            url = '/v1/admin/{0}?{1}'.format(data_type, params)
         else:
             url = '/v1/admin/{0}'.format(data_type)
         hdrs = {'Content-Type': 'application/octet-stream'}
@@ -136,14 +136,14 @@ class Controller(object):
         return resp
 
     def upload_file_to_dir(self, data_type, path, file_data):
-        url = quote_plus('/v1/admin/{0}/{1}'.format(data_type, path))
+        url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         hdrs = {'Content-Type': 'application/octet-stream'}
         self.http_client.raw_request('POST', url,
                                      headers=hdrs,
                                      body=file_data)
 
     def get_file(self, data_type, file_path):
-        url = quote_plus('/v1/admin/{0}/{1}'.format(data_type, file_path))
+        url = quote('/v1/admin/{0}/{1}'.format(data_type, file_path))
         resp, body = self.http_client.raw_request('GET', url)
         body_str = ''.join([chunk for chunk in body])
         return StringIO.StringIO(body_str)
@@ -154,5 +154,5 @@ class Controller(object):
 
     def delete(self, data_type, path):
         # space could be in url paths.
-        url = quote_plus('/v1/admin/{0}/{1}'.format(data_type, path))
+        url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
