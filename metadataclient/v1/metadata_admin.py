@@ -38,21 +38,33 @@ class Controller(object):
         else:
             raise exc.HTTPInternalServerError()
 
-    def get_service_files(self, data_type, service=None):
-        included_files = {}
-        if service:
+    def get_service_files(self, data_type=None, service=None):
+        included_files, all_files = {}, []
+
+        def update_files(_data_type):
+            if service:
+                resp, body = self.http_client.json_request(
+                    'GET',
+                    '/v1/admin/services/{service}'.format(service=service))
+                for path in body.get('service_files', {}).get(data_type, []):
+                    included_files[path] = True
+
             resp, body = self.http_client.json_request(
-                'GET', '/v1/admin/services/{service}'.format(service=service))
-            for path in body.get('service_files', {}).get(data_type, []):
-                included_files[path] = True
+                'GET', '/v1/admin/{data_type}'.format(data_type=_data_type))
+            data_type_files = body.get(_data_type, [])
 
-        resp, body = self.http_client.json_request(
-            'GET', '/v1/admin/{data_type}'.format(data_type=data_type))
-        all_files = body.get(data_type, [])
+            all_files.extend(
+                [Wrapper(path, path=dirname(path), filename=basename(path),
+                         selected=included_files.get(path, False),
+                         data_type=_data_type) for path in data_type_files])
 
-        return [Wrapper(path, path=dirname(path), filename=basename(path),
-                        selected=included_files.get(path, False))
-                for path in all_files]
+        if data_type:
+            update_files(data_type)
+        else:
+            for data_type in ('ui', 'workflows', 'heat', 'agent', 'scripts'):
+                update_files(data_type)
+
+        return all_files
 
     def download_service(self, service):
         resp, body = self.http_client.raw_request(
