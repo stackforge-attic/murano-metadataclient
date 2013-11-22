@@ -170,13 +170,7 @@ class Controller(object):
         url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
 
-    def create_service(self, json_data):
-        url = quote('/v1//admin/services/create')
+    def create_service(self, service, json_data):
+        url = quote('/v1/admin/services/{service}'.format(service=service))
         resp, body = self.http_client.json_request('PUT', url, body=json_data)
-        return body
-
-    def update_service(self, service_name, json_data):
-        url = quote('/v1//admin/services/{service}'.format(
-            service=service_name))
-        resp, body = self.http_client.json_request('POST', url, body=json_data)
         return body
