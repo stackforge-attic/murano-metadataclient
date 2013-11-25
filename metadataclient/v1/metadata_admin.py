@@ -54,7 +54,8 @@ class Controller(object):
                 'GET', '/v1/admin/{data_type}'.format(data_type=_data_type))
             files = body.get(_data_type, [])
 
-            return [Wrapper(path, path=dirname(path), filename=basename(path),
+            return [Wrapper('{0}##{1}'.format(_data_type, path),
+                            path=dirname(path), filename=basename(path),
                             selected=included_files.get(path, False),
                             data_type=_data_type)
                     for path in files]
