@@ -69,6 +69,11 @@ class Controller(object):
 
         return all_files
 
+    def get_service_info(self, service):
+        resp, body = self.http_client.json_request(
+            'GET', '/v1/admin/services/{service}/info'.format(service=service))
+        return body
+
     def download_service(self, service):
         resp, body = self.http_client.raw_request(
             'GET', '/v1/client/services/{service}'.format(service=service))
