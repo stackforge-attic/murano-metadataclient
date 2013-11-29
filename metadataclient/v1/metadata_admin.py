@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
+import json
 from os.path import dirname, basename
 
 from metadataclient import exc
@@ -154,6 +155,15 @@ class Controller(object):
                                                   headers=hdrs,
                                                   body=file_data)
         return resp
+
+    def upload_file_to_service(self, data_type, file_data,
+                               file_name, service_id):
+        self.upload_file(data_type, file_data, file_name)
+        url = quote('v1/admin/services/{service}/update'.format(
+            service=service_id))
+        resp, body = self.http_client.json_request(
+            'POST', url, body={data_type: [file_name]})
+        return body
 
     def upload_file_to_dir(self, data_type, path, file_data):
         url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
