@@ -32,7 +32,7 @@ class Controller(object):
     def list_services(self):
         resp, body = self.http_client.json_request('GET', '/v1/admin/services')
         services = body.get('services', None)
-        if services:
+        if services is not None:
             return [Wrapper(service['full_service_name'], **service)
                     for service in services]
         else:
