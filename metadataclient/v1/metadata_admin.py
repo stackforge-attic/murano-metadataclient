@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
+import json
 from os.path import dirname, basename
 
 from metadataclient import exc
@@ -155,6 +156,28 @@ class Controller(object):
                                                   body=file_data)
         return resp
 
+    def upload_file_to_service(self, data_type, file_data,
+                               file_name, service_id):
+        self.upload_file(data_type, file_data, file_name)
+        service_info = self.get_service_info(service_id).values()[0]
+        resp, body = self.http_client.json_request(
+                    'GET',
+                    '/v1/admin/services/{service}'.format(service=service_id))
+        service_files = body.values()[0]
+        existing_files = service_files.get(data_type)
+        if existing_files:
+            service_files[data_type].append(file_name)
+        else:
+            service_files[data_type] = [file_name]
+
+        service_info.update(service_files)
+        url = quote('v1/admin/services/{service}'.format(
+            service=service_id))
+        resp, body = self.http_client.json_request('PUT',
+                                                   url,
+                                                   body=service_info)
+        return body
+
     def upload_file_to_dir(self, data_type, path, file_data):
         url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         hdrs = {'Content-Type': 'application/octet-stream'}
@@ -176,6 +199,7 @@ class Controller(object):
         url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
 
+    #ToDo: Rename it
     def create_service(self, service, json_data):
         url = quote('/v1/admin/services/{service}'.format(service=service))
         resp, body = self.http_client.json_request('PUT', url, body=json_data)
