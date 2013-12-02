@@ -48,7 +48,7 @@ class Controller(object):
                 resp, body = self.http_client.json_request(
                     'GET',
                     '/v1/admin/services/{service}'.format(service=service))
-                for path in body.get('service_files', {}).get(_data_type, []):
+                for path in body.get(_data_type, []):
                     included_files[path] = True
 
             resp, body = self.http_client.json_request(
@@ -160,9 +160,8 @@ class Controller(object):
                                file_name, service_id):
         self.upload_file(data_type, file_data, file_name)
         service_info = self.get_service_info(service_id).values()[0]
-        resp, body = self.http_client.json_request(
+        resp, service_files = self.http_client.json_request(
             'GET', '/v1/admin/services/{service}'.format(service=service_id))
-        service_files = body.values()[0]
         existing_files = service_files.get(data_type)
         if existing_files:
             service_files[data_type].append(file_name)
@@ -198,8 +197,7 @@ class Controller(object):
         url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
 
-    #ToDo: Rename it
-    def create_service(self, service, json_data):
+    def create_or_update_service(self, service, json_data):
         url = quote('/v1/admin/services/{service}'.format(service=service))
         resp, body = self.http_client.json_request('PUT', url, body=json_data)
         return body
