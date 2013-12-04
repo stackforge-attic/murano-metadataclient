@@ -12,7 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
-import json
 from os.path import dirname, basename
 
 from metadataclient import exc
@@ -31,7 +30,7 @@ class Controller(object):
         self.http_client = http_client
 
     def list_services(self):
-        resp, body = self.http_client.json_request('GET', '/v1/admin/services')
+        resp, body = self.http_client.json_request('GET', '/admin/services')
         services = body.get('services', None)
         if services is not None:
             return [Wrapper(service['full_service_name'], **service)
@@ -47,12 +46,12 @@ class Controller(object):
             if service:
                 resp, body = self.http_client.json_request(
                     'GET',
-                    '/v1/admin/services/{service}'.format(service=service))
+                    '/admin/services/{service}'.format(service=service))
                 for path in body.get(_data_type, []):
                     included_files[path] = True
 
             resp, body = self.http_client.json_request(
-                'GET', '/v1/admin/{data_type}'.format(data_type=_data_type))
+                'GET', '/admin/{data_type}'.format(data_type=_data_type))
             files = body.get(_data_type, [])
 
             return [Wrapper('{0}##{1}'.format(_data_type, path),
@@ -72,84 +71,84 @@ class Controller(object):
 
     def get_service_info(self, service):
         resp, body = self.http_client.json_request(
-            'GET', '/v1/admin/services/{service}/info'.format(service=service))
+            'GET', '/admin/services/{service}/info'.format(service=service))
         return body
 
     def download_service(self, service):
         resp, body = self.http_client.raw_request(
-            'GET', '/v1/client/services/{service}'.format(service=service))
+            'GET', '/client/services/{service}'.format(service=service))
         return body
 
     def upload_service(self, data):
         resp, body = self.http_client.raw_request(
-            'POST', '/v1/admin/services/', body=data)
+            'POST', '/admin/services/', body=data)
         return body
 
     def delete_service(self, service):
         resp, body = self.http_client.raw_request(
-            'DELETE', '/v1/admin/services/{service}'.format(service=service))
+            'DELETE', '/admin/services/{service}'.format(service=service))
         return body
 
     def toggle_enabled(self, service):
         resp, body = self.http_client.raw_request(
-            'POST', '/v1/admin/services/{service}/toggle_enabled'.format(
+            'POST', '/admin/services/{service}/toggle_enabled'.format(
                 service=service))
         return body
 
     def list_ui(self, path=None):
         if path:
-            url = quote('/v1/admin/ui/{path}'.format(path=path))
+            url = quote('/admin/ui/{path}'.format(path=path))
         else:
-            url = '/v1/admin/ui'
+            url = '/admin/ui'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def list_agent(self, path=None):
         if path:
-            url = quote('/v1/admin/agent/{path}'.format(path=path))
+            url = quote('/admin/agent/{path}'.format(path=path))
         else:
-            url = '/v1/admin/agent'
+            url = '/admin/agent'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def list_scripts(self, path=None):
         if path:
-            url = quote('/v1/admin/scripts/{path}'.format(path=path))
+            url = quote('/admin/scripts/{path}'.format(path=path))
         else:
-            url = '/v1/admin/scripts'
+            url = '/admin/scripts'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def list_workflows(self, path=None):
         if path:
-            url = quote('/v1/admin/workflows/{path}'.format(path=path))
+            url = quote('/admin/workflows/{path}'.format(path=path))
         else:
-            url = '/v1/admin/workflows'
+            url = '/admin/workflows'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def list_heat(self, path=None):
         if path:
-            url = quote('/v1/admin/heat/{path}'.format(path=path))
+            url = quote('/admin/heat/{path}'.format(path=path))
         else:
-            url = '/v1/admin/heat'
+            url = '/admin/heat'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def list_manifests(self, path=None):
         if path:
-            url = quote('/v1/admin/manifests/{path}'.format(path=path))
+            url = quote('/admin/manifests/{path}'.format(path=path))
         else:
-            url = '/v1/admin/manifests'
+            url = '/admin/manifests'
         resp, body = self.http_client.json_request('GET', url)
         return body
 
     def upload_file(self, data_type, file_data, file_name=None):
         if file_name:
             params = urlencode({'filename': file_name})
-            url = '/v1/admin/{0}?{1}'.format(data_type, params)
+            url = '/admin/{0}?{1}'.format(data_type, params)
         else:
-            url = '/v1/admin/{0}'.format(data_type)
+            url = '/admin/{0}'.format(data_type)
         hdrs = {'Content-Type': 'application/octet-stream'}
         resp, body = self.http_client.raw_request('POST', url,
                                                   headers=hdrs,
@@ -161,7 +160,7 @@ class Controller(object):
         self.upload_file(data_type, file_data, file_name)
         service_info = self.get_service_info(service_id).values()[0]
         resp, service_files = self.http_client.json_request(
-            'GET', '/v1/admin/services/{service}'.format(service=service_id))
+            'GET', '/admin/services/{service}'.format(service=service_id))
         existing_files = service_files.get(data_type)
         if existing_files:
             service_files[data_type].append(file_name)
@@ -177,27 +176,27 @@ class Controller(object):
         return body
 
     def upload_file_to_dir(self, data_type, path, file_data):
-        url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
+        url = quote('/admin/{0}/{1}'.format(data_type, path))
         hdrs = {'Content-Type': 'application/octet-stream'}
         self.http_client.raw_request('POST', url,
                                      headers=hdrs,
                                      body=file_data)
 
     def get_file(self, data_type, file_path):
-        url = quote('/v1/admin/{0}/{1}'.format(data_type, file_path))
+        url = quote('/admin/{0}/{1}'.format(data_type, file_path))
         resp, body = self.http_client.raw_request('GET', url)
         body_str = ''.join([chunk for chunk in body])
         return StringIO.StringIO(body_str)
 
     def create_directory(self, data_type, dir_name):
-        url = '/v1/admin/{0}/{1}'.format(data_type, dir_name)
+        url = '/admin/{0}/{1}'.format(data_type, dir_name)
         self.http_client.json_request('PUT', url)
 
     def delete(self, data_type, path):
-        url = quote('/v1/admin/{0}/{1}'.format(data_type, path))
+        url = quote('/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
 
     def create_or_update_service(self, service, json_data):
-        url = quote('/v1/admin/services/{service}'.format(service=service))
+        url = quote('/admin/services/{service}'.format(service=service))
         resp, body = self.http_client.json_request('PUT', url, body=json_data)
         return body

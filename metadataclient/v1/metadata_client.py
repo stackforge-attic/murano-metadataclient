@@ -19,9 +19,9 @@ class Controller(object):
 
     def _get_data(self, endpoint_type, hash_sum=None):
         if hash_sum:
-            url = '/v1/client/{0}?hash={1}'.format(endpoint_type, hash_sum)
+            url = '/client/{0}?hash={1}'.format(endpoint_type, hash_sum)
         else:
-            url = '/v1/client/{0}'.format(endpoint_type)
+            url = '/client/{0}'.format(endpoint_type)
         return self.http_client.raw_request('GET', url)
 
     def get_ui_data(self, hash_sum=None):
