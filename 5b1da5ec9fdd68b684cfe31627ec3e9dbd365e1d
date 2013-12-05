@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Approved+1: Timur Sufiev <tsufiev@mirantis.com>
+Code-Review+2: Timur Sufiev <tsufiev@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Thu, 05 Dec 2013 08:57:55 +0000
+Reviewed-on: https://review.openstack.org/59987
+Project: stackforge/murano-metadataclient
+Branch: refs/heads/master
