@@ -158,7 +158,7 @@ class Controller(object):
     def upload_file_to_service(self, data_type, file_data,
                                file_name, service_id):
         self.upload_file(data_type, file_data, file_name)
-        service_info = self.get_service_info(service_id).values()[0]
+        service_info = self.get_service_info(service_id).values()
         resp, service_files = self.http_client.json_request(
             'GET', '/admin/services/{service}'.format(service=service_id))
         existing_files = service_files.get(data_type)
