@@ -155,6 +155,13 @@ class Controller(object):
                                                   body=file_data)
         return resp
 
+    def _update_service(self, service_files, service_id, service_info):
+        service_info.update(service_files)
+        url = quote('/admin/services/{service}'.format(service=service_id))
+        resp, body = self.http_client.json_request('PUT', url,
+                                                   body=service_info)
+        return resp, body
+
     def upload_file_to_service(self, data_type, file_data,
                                file_name, service_id):
         self.upload_file(data_type, file_data, file_name)
@@ -166,13 +173,9 @@ class Controller(object):
             service_files[data_type].append(file_name)
         else:
             service_files[data_type] = [file_name]
-
-        service_info.update(service_files)
-        url = quote('/admin/services/{service}'.format(
-            service=service_id))
-        resp, body = self.http_client.json_request('PUT',
-                                                   url,
-                                                   body=service_info)
+        resp, body = self._update_service(service_files,
+                                          service_id,
+                                          service_info)
         return body
 
     def upload_file_to_dir(self, data_type, path, file_data):
@@ -195,6 +198,21 @@ class Controller(object):
     def delete(self, data_type, path):
         url = quote('/admin/{0}/{1}'.format(data_type, path))
         self.http_client.raw_request('DELETE', url)
+
+    def delete_from_service(self, data_type, filename, service_id):
+        service_info = self.get_service_info(service_id)
+        resp, service_files = self.http_client.json_request(
+            'GET', '/admin/services/{service}'.format(service=service_id))
+        files = service_files.get(data_type)
+        if filename in files:
+            service_files[data_type].remove(filename)
+        resp, body = self._update_service(service_files,
+                                          service_id,
+                                          service_info)
+        if resp.status == 200:
+            url = quote('/admin/{0}/{1}'.format(data_type, filename))
+            self.http_client.raw_request('DELETE', url)
+        return body
 
     def create_or_update_service(self, service, json_data):
         url = quote('/admin/services/{service}'.format(service=service))
