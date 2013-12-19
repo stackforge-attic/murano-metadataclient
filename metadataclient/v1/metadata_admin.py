@@ -215,6 +215,10 @@ class Controller(object):
         return body
 
     def create_or_update_service(self, service, json_data):
+        # Increment version in case of modification
+        json_data['service_version'] += 1
+
+        json_data['version'] = u'0.1'  # Version of metadata
         url = quote('/admin/services/{service}'.format(service=service))
         resp, body = self.http_client.json_request('PUT', url, body=json_data)
         return body
