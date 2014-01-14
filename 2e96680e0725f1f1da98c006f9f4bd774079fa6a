@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Approved+1: Timur Nurlygayanov <tnurlygayanov@mirantis.com>
+Code-Review+2: Timur Nurlygayanov <tnurlygayanov@mirantis.com>
+Code-Review+2: Ekaterina Fedorova <efedorova@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 14 Jan 2014 09:17:38 +0000
+Reviewed-on: https://review.openstack.org/66300
+Project: stackforge/murano-metadataclient
+Branch: refs/heads/release-0.4
