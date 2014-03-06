@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import StringIO
+import types
 from os.path import dirname, basename
 
 from metadataclient import exc
@@ -23,6 +24,15 @@ class Wrapper(object):
         self.id = entity_id
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def __str__(self):
+        if isinstance(self.id, types.StringTypes):
+            return self.id.replace('##', '/')
+        else:
+            return str(self.id)
+
+    def __repr__(self):
+        return 'RowWrapper({0})'.format(str(self))
 
 
 class Controller(object):
